@@ -28,9 +28,9 @@ The `release.sh` script converts folder names to asset names automatically:
 {locale}-{voice}-{quality}  →  tts_piper_{lang}_{voice}_{quality}.tar.gz
 ```
 
-Example: `de_DE-thorsten-low` → `tts_piper_de_thorsten_low.tar.gz`
+Example: `de_DE-thorsten-low` → `tts_piper_de_de_thorsten_low.tar.gz`
 
-The language code is extracted from the locale prefix (e.g. `de_DE` → `de`).
+The folder name is lowercased and all non-alphanumeric characters replaced with `_`.
 
 ## Adding a new voice
 

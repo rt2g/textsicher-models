@@ -28,35 +28,29 @@ fi
 echo "=== Building release $VERSION ==="
 ASSETS=()
 
-# --- TTS: tts/piper/{locale}-{voice}-{quality}/ ---
+# Converts a folder name to a safe asset suffix:
+# any non-alphanumeric character → underscore, then lowercase
+to_asset_name() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '_' | sed 's/_$//'
+}
+
+# --- TTS: tts/piper/*/ ---
 for dir in "$SCRIPT_DIR/tts/piper"/*/; do
   [[ -d "$dir" ]] || continue
   folder=$(basename "$dir")
-
-  # Extract language from locale prefix (e.g. de_DE-thorsten-low → de)
-  locale="${folder%%-*}"           # de_DE
-  lang="${locale%%_*}"             # de
-  rest="${folder#*-}"              # thorsten-low
-  rest_underscored="${rest//-/_}"  # thorsten_low
-
-  asset_name="tts_piper_${lang}_${rest_underscored}.tar.gz"
+  asset_name="tts_piper_$(to_asset_name "$folder").tar.gz"
   archive="$TMP_DIR/$asset_name"
-
   echo "  Packing $folder → $asset_name"
   tar -czf "$archive" -C "$SCRIPT_DIR/tts/piper" "$folder"
   ASSETS+=("$archive")
 done
 
-# --- STT: stt/sherpa-onnx/{lang}-{model}-{date}/ ---
+# --- STT: stt/sherpa-onnx/*/ ---
 for dir in "$SCRIPT_DIR/stt/sherpa-onnx"/*/; do
   [[ -d "$dir" ]] || continue
   folder=$(basename "$dir")
-
-  # e.g. de-kroko-2025-08-06 → stt_sherpa_de_kroko_2025_08_06
-  folder_underscored="${folder//-/_}"
-  asset_name="stt_sherpa_${folder_underscored}.tar.gz"
+  asset_name="stt_sherpa_$(to_asset_name "$folder").tar.gz"
   archive="$TMP_DIR/$asset_name"
-
   echo "  Packing $folder → $asset_name"
   tar -czf "$archive" -C "$SCRIPT_DIR/stt/sherpa-onnx" "$folder"
   ASSETS+=("$archive")
